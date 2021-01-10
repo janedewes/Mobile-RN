@@ -1,0 +1,213 @@
+Firebase: Serviço Google
+
+Criar com conta google: https://firebase.google.com/?hl=pt-br
+
+Ir para o console
+
+----------------------------------------------------------------
+
+Serviço: Banco de Dados 
+
+- NoSQL
+
+Servidor Normal: A cada x segundos, requisita o servidor e retorna os dados.
+Firebase: Me mande quando tiver novidades. 
+
+
+----------------------------------------------------------------
+
+1. Instalação e configuração 
+
+- Criar projeto normal (react native)
+
+- 1º instalar no projeto primeiro, depois utilizar! 
+terminal, pasta do projeto: npm install --save firebase
+terminal: iniciar o projeto 
+
+
+No App.js 
+import firebase from 'firebase';
+
+
+Configuração: 
+- site do firebase - "Adicionar o Firebase ao seu aplicativo da Web" (pois ele é em js)
+- copiar a var e o comando de inicializarApp, inserir dentro do construtor, no App.js!
+- No site, em database - o firebase so deixa alterar as infos do bando de dados se tiver autenticado, para mudar isso, entrar a aba REGRAS, 
+Trocar por true:
+    ".read": true,
+    ".write": true
+
+Mais tarde trocar para USAR AUTENTICAÇÃO!
+----------------------------------------------------------------
+
+
+2. Firebase: Pegando dados do banco
+
+App.js: Dentro do construtor:
+let config= {
+    chaves
+};
+
+firebase.initializeApp(config);
+
+firebase.database().ref("nome-do-nó/1/nome").on('value', (snapshot)=>{
+    let state = this.state;
+    state.name = snapshot.val();
+    this.setState(state);
+});
+# OBS: a fç acima altera as infos toda vez q alteramos no app ou no BD. [add um Listener(ouvinte)]
+
+# OBS: a fç abaixo faz a alteração somente uma vez:
+firebase.initializeApp(config);
+firebase.database().ref("nome-do-nó/1/nome").once('value').then((snapshot)=>{
+    let state = this.state;
+    state.name = snapshot.val();
+    this.setState(state);
+});
+
+----------------------------------------------------------------
+
+3. Firebase: Inserir/Alterar/Deletar Dados
+
+inserirUsuario() {
+    if(this.state.nomeInput.length > 0) { #verificar se o campo nao esta em branco
+
+        let usuarios = firebase.database().ref('usuarios'); #selecionando o nó usuários
+
+        let chave = usuarios.push().key; #gerando uma chave unica e add a uma var
+
+        usuarios.child(chave).set({ # selecionar a chave gerada 
+            nome:this.state.nomeInput, #add itens à chave
+            idade:this.state.idadeInput
+        });
+    }
+}
+
+----------------------------------------------------------------
+
+4. Firebase: Trabalhando com Listas
+
+----------------------------------------------------------------
+
+5. Firebase Auth: Criando usuários
+
+Serviço: AUTENTICAÇÃO (para cadastro/login)
+
+- Metodo de login: ativar o metodo que será usado para login
+
+App.js - criar estrutura de input.
+
+cadastrar() {
+    firebase.auth().createUserWithEmailAndPassword( # se a opção escolhida for email e senha!
+        this,state.email, 
+        this.state.senha
+    ).catch((error)=>{
+
+        switch(error.code) {
+            case 'auth/weak-password':
+                alert("Sua senha deve ter no mínimo 6 caracteres!");
+            break;
+            case 'auth/email-already-in-use':
+                alert("Este email já tem conta);
+            break;
+            default: 
+                alert("Ocorreu um erro! Tente novamente mais tarde");
+            break;
+            ...email inválido
+            .... etc. 
+        }
+    
+    });
+}
+
+----------------------------------------------------------------
+
+6. Firebase Auth: Logando usuários
+
+1º etapa: add um listener para saber quando o status do firebase mudar:logado  ou não logado
+Com um usuário já cadastrado.
+Dentro do construtor:
+
+firebase.auth().signOut();
+
+## Ouvinte
+firebase.auth().onAuthStateChanged((user)=>{
+    if(user) {
+        alert("Fez login com sucesso!");
+    } else {
+        alert("Saiu do sistema!");
+    }
+});
+
+
+logar() {
+    firebase.auth().signInWithEmailAndPassword(
+        this.state.email,
+        this.state.senha
+    ).catch((error)=>{
+        if(error.code == 'auth/wrong-passord') {
+            alert("senha incorreta");
+        } else {
+            alert ("Tente novamente mais tarde!");
+        }
+    });
+}
+
+sair() {
+    firebase.auth().singOut();
+}
+
+- Criar botão para logar e para sair no App
+
+NO SITE: DOCS tem toda documentação necessária !!!
+
+
+
+----------------------------------------------------------------
+7. Firebase: Sincronizando Auth e Database
+
+Site: 
+Em autenticação: "IUD do usuário" que faz a sincronização. Esse hash é unico para cada usuário, podemos usál-lo para identificar coisas 
+dentro do banco de dados.
+No app terá uma fç que cadastra o usuário e outra que receberá os dados. 
+
+----------------------------------------------------------------
+8. Firebase: Associação com outros dados
+
+A partir de um login é possivel manipular vários nós ao mesmo tempo. Ou seja, tanto para pegar o nome do usuários quanto outros itens. 
+
+
+----------------------------------------------------------------
+9. Firebase Auth: Trocar email/senha
+
+Para alterar senha é necessários fazer o login primeiro.
+No app: 
+redefinir() {
+
+}
+
+----------------------------------------------------------------
+10. Firebase em múltiplas telas
+
+No App:
+Fazer a conexão com o firebase em um único local e usar essa conexão em todas as telas.  
+Usar algum navigator para trocar de tela.
+
+Usar um stack navigator (que vem antes do App.js). 
+- Criar pasta src 
+    Login.js -  código de login
+    Home.js - pág inicial do sistema
+
+
+----------------------------------------------------------------
+11. Firebase: Organização de código
+
+Como usar o firebase: Não usar em todas as telas, apenas em um único arquivo!
+Na pasta src:
+    Aquivo onde ficará toda a lógica do app: Nome_arq.js (todas as ações em que é usado o firebase ficarão nesse arq)
+    (a conecxão com o firebase pode ficar nesse arq ou não)
+    (tratamento dos erros  são feitos na propria tela, não nesse arq)
+
+
+----------------------------------------------------------------
+
