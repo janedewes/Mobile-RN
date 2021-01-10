@@ -1,0 +1,137 @@
+
+1. Como funciona o recebimento de notificações
+
+- O servidor identifica o celular (token) e envia uma mensagem para este celular, to tipo:
+    -- notificação 
+    -- notificação + dados 
+    -- apenas dados
+
+- Dependendo do ESTADO atual do aplicativo, ele vai reagir diferente.
+    -- Quanto o app está ABERTO
+    -- Quando o app está ativo mas minimizado. (exibe notificação)
+    -- Quando o app está fechado. (exibe notificação)
+
+--------------------------------------------------------------------------------------------
+
+2. Como funciona o envio de notificações
+
+O envio ocorre por QUALQUER servidor (pessoa, firebase, etc)
+
+- Se tiver o TOKEN de um dispositivo , consigo mandar mensagem DIRETAMENTE para ele. 
+- É possível enviar mensagens para TODOS os dispositivos que tiverem o meu app.
+- Também é possível enviar mensagens  para dispositivos cadastrados em determinado tópico. 
+
+1 usuário possui 2 dispositivos 
+
+--------------------------------------------------------------------------------------------
+
+3. Configurando o FCM - Firebase Cloud Message
+
+- Criar um projeto react-native e configurar o firebase nele. 
+
+- FCM: na pasta do projeto instalar a biblioteca responsável pelo FCM:
+terminal: npm install @react-native-firebase/messaging
+
+- Rodar o app para verificar se está tudo ok:
+npx react-native run-android
+
+
+********************************************************************************************* Exemplo *************************************
+- Em App.js criar uma estrutura básica:
+
+import  React, { useState, useEffect } from 'react';
+import { SafeAreaView, View, Text, StyleSheet } from 'react-native';
+import messagin from '@react-native-firebase/messaging';
+
+
+export default () => {
+
+    //Alguns dispositivos android precisam de uma solicitação de permissão específica:
+    useEffect(()=>{
+        const requestNotifPermission = async () => {
+            const authStatus = await messagin().requestPermission();
+
+            //Verificação:(essa permissao fica visível no metroblunder)
+            console.log('Permissão', authStatus);
+        }
+        //Rodar a fç criada acima:
+        requestNotifPermission();
+    }, []);
+
+
+    return (
+        <SafeAreaView>
+            <Text> Um texto qualquer..... </Text>
+        </SafeAreaView>
+    );
+}
+
+*********************************************************************************************************************************************
+
+
+4. Preparando aplicativo
+
+********************************************************* Exemplo: *********************************************************
+
+import  React, { useState, useEffect } from 'react';
+import { SafeAreaView, View, Text, StyleSheet } from 'react-native';
+import messagin from '@react-native-firebase/messaging';
+
+
+export default () => {
+
+    // tipos de Status:
+    // - feito
+    // - aceito 
+    // - enviado
+    // - entregue
+    const [orderStatusText, setOrderStats] = useState('feito');
+
+    //Alguns dispositivos android precisam de uma solicitação de permissão específica:
+    useEffect(()=>{
+        const requestNotifPermission = async () => {
+            const authStatus = await messagin().requestPermission();
+
+            //Verificação:(essa permissao fica visível no metroblunder)
+            console.log('Permissão', authStatus);
+        }
+        //Rodar a fç criada acima:
+        requestNotifPermission();
+    }, []);
+
+
+    return (
+        <SafeAreaView style={styles.container}>
+            <Text style={styles.orderTitle}> Pedido #1234 </Text>
+            <Text> Status: </Text>
+            <Text style={styles.orderStatusText}> 
+                {orderStatus == 'feito' && '#1 Seu pedido foi feito'}
+                {orderStatus == 'aceito'  && '#2 Seu pedido está sendo preparado'}
+                {orderStatus == 'enviado' && '#3 Saiu para entrega'}
+                {orderStatus == 'entregue' && '#4 Pedido entregue com sucesso'}
+            </Text>
+        </SafeAreaView>
+    );
+}
+
+// css 
+const styles =  StyleSheet.create({
+    container:{
+        flex:1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    }, 
+    orderTitle:{
+        fontSize: 20,
+        marginBottom: 20
+    },
+    orderStatusText:{
+        fontSize: 17
+    }
+});
+
+
+*********************************************************************************************************************************************
+
+5. Recebendo notificações em foreground
+
