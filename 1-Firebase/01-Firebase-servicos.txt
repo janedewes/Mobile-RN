@@ -6,7 +6,7 @@ Ir para o console
 
 ----------------------------------------------------------------
 
-Serviço: Banco de Dados 
+****************************************************************** Serviço: Banco de Dados *******************************************************
 
 - NoSQL
 
@@ -91,7 +91,7 @@ inserirUsuario() {
 
 5. Firebase Auth: Criando usuários
 
-Serviço: AUTENTICAÇÃO (para cadastro/login)
+************************************************************ Serviço: AUTENTICAÇÃO (para cadastro/login)  ************************************
 
 - Metodo de login: ativar o metodo que será usado para login
 
@@ -209,5 +209,167 @@ Na pasta src:
     (tratamento dos erros  são feitos na propria tela, não nesse arq)
 
 
+
+
+
+******************************************************************** Serviço: Storage ********************************************************
+
+12. Firebase Storage: Como funciona
+
+- Armazenamento de aqruivos, fotos, etc. 
+- Enviar e pegar aqruivos do firebase.
+- Criação de nós (dentro dos nós ou + nós ou referências[criada a referecia add o arq nela])
+
+
+App.js 
+
+// pasta raiz do firebase, a partir dela entramos nos nós e pegamos os arqs. 
+firebase.storage().ref().child('images').child('imagem.jpg');
+ou 
+firebase.storage().ref().child('images/imagem.jpg');
+
+
+// navegação entre pastas: parent -> retorna uma passta. 
+let images = firebase.storage().ref().child('assets').child('images');
+let arquivos = images.parent.child('files');
+ou 
+let arquivos = firebase.storage().ref().child('assets/files')
+
+// voltar para raiz do storage
+let raiz = images.root;
+// raiz:
+firebase.storage().ref();
+
 ----------------------------------------------------------------
 
+13. Firebase Storage: Pré-upload
+
+- habilitar permissão para esse tipo de processo: (é uma biblioteca para pegar imagens da camera/biblioteca do celular etc.)
+    Sem o projeto estar rodando, no terminal, entrar na pasta do projeto: npm install react-native-image-picker@latest --save
+
+
+- Configurar projeto: (fazer para android e IOS)
+
+    1- Para Android: Pasta android - arq build.gradle:
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.2.+' // trocar o numero pelo +
+    }
+    Salvar
+
+    2- Pasta app - pasta src - pasta main - arq AndroidManifest.xml: // Adicionar permissões (acessar a camera e hd do celular)
+        Abaixo dos <uses-permission..../> existentes no arq, add:
+        <uses-permission android:name="android.permission.CAMARA"/>
+        <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+        Salvar
+
+    3. Voltar para o terminal/pasta do projeto e digitar: react-native link 
+
+    4. Rodar o projeto: npx react-native run-android
+
+
+
+- Usar: App.js
+    import ImagePicker from 'react-native-image-picker';
+
+    Criar uma estrutura(c/ botao) para pegar uma foto 
+
+    // construtor:
+    this.pegarFoto = this.pegarFoto.bind(this);
+
+
+    // Abrir as fotos do celular e pegar uma: ***************//abrir camera: launchCamera //escolher camera ou biblioteca: showImagePicker
+    pegarFoto() {
+        ImagePicker.launchImageLibrary(null, (r)=>{
+            //verificar se uma foto foi selecionada:
+            if(r.uri) {
+                let foto = {uri:r.uri}; //salvar em json 
+
+                let state = this.state;
+                state.foto = foto;
+                this.setState(state);
+            }
+ 
+        })
+    }
+
+    render() 
+    // carregar foto
+    <Image source={this.state.foto} style={styles.foto} />
+
+
+    // css
+    const styles = StyleSheet.create({
+        foto:{
+            width:300,
+            height:300
+        }
+    });
+
+----------------------------------------------------------------
+
+14. Firebase Storage: Upload de arquivos
+
+    - Usar a imagem da galeria e enviar para o firebase starage.
+    - Fazer uma alteração, pois o firebase recebe em um formato diferente:
+    Etapas:
+    1- Escolher a imagem
+    2- transformar em blob
+    3- enviar para o firebase
+
+    - Biblioteca para transformar a imagem em blob, pasta do projeto: npm install --save react-native-fetch-blob
+
+    - terminal: react-native link
+
+    - terminal: npx react-native run-android
+
+    - Inserir no projeto: 
+    import RNFetchBlob from  'react-native-fetch-blob';
+
+    - Para usar essa biblioteca -  criar duas variaveis globais
+    Logo abaixo do import:
+    window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest;
+    window.Blob = RNFetchBlob.polyfill.Blob;
+
+    - criar estrutura para transformar o arq em blob.
+    - preparar para o firebase starage receber a img
+    - criar var p o tipo de arq (jpeg/pdf/....)
+
+    - enviar para o firebase storage
+    - atraves da url criada no firebase é possivel usar essa img em qquer lugar
+
+----------------------------------------------------------------
+
+15. Firebase Storage: Progresso do upload
+
+- calcular a % dos bytes carregados 
+- fçs anonimas para uma ser executada sempre que algo mudar, outra para erro e mais umapara conclusao do upload.
+
+- Barra de Progresso
+
+----------------------------------------------------------------
+
+16. Firebase Storage: Pegar arquivos
+
+- Pegar uma img do firebase storage e exibir na tela 
+
+image.getDownloadURL().then((url)=>{
+    ...
+    ...
+});
+- Selecionar a referencia do arq que queremos e solicitar o getDownloadURL, executa a fç para exibir a img. 
+----------------------------------------------------------------
+
+17. Firebase Storage: Deletar arquivos
+
+- Criar estrutura para remover img - selecionar a referencia depois deleta. 
+remover() {
+    firebase.storage().ref().child('images/imagem.jpg').delete().then(()=>{
+        ...
+        ...
+    }).catch((error)=>{
+        alert(error.code);
+    });
+}
+
+
+--------------------------------------------------------------------------------------------------------------

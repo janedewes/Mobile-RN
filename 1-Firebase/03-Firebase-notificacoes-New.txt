@@ -135,3 +135,4 @@ const styles =  StyleSheet.create({
 
 5. Recebendo notificações em foreground
 
+npx react-native run-android
