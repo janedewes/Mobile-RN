@@ -1,0 +1,61 @@
+React Native 
+
+1- Criar projeto (novo):
+npx react-native init NomeDoProjeto
+
+1. Criar projeto Firebase para usar o CloundFirestone junto:
+npx react-native init FirebaseFirestoneRN (esse é o projeto que está na pasta Mobile)
+
+--------------------------------------------------------------------------------------
+
+2 - Rodar o projeto no emulador: Abrir o emulador no Android Studio 
+terminal  01:npx react-native start
+terminal 02:npx react-native run-android
+
+
+--------------------------------------------------------------------------------------
+
+3 - Instalar as bibliotecas necessarias: Entrar na pasta do projeto - (usando Firebase)
+npm install @react-native-firebase/app (independente de qual produto do firebase for usado)
+
+
+--------------------------------------------------------------------------------------
+
+4 - Instalar bibliotecas: (acompanhar pela documentação)
+
+1) Configurando o navigation: 
+npm install 
+	react-navigation (Stack e Drawer)
+	react-native-gesture-handler
+	react-native-reanimated
+	react-native-screens 
+	--save
+
+2) Configurando o Redux: (Redux para transferir dados de uma tela para outra e ReduxPersist para persistir os dados usando o AsyncStorage)
+npm install redux 
+	react-redux
+	redux-persist 
+	--save
+
+3) Configurando o AsyncStorage
+npm install @react-native-async-storage/async-storage -save --force
+
+
+4) Instalando e configurando o Stack e drawer:
+npm install react-navigation-stack -save --force
+npm install react-navigation-drawer -save --force
+
+5) npm install styled-components -save --force
+	    
+--------------------------------------------------------------------------------------
+
+5 - Redux
+
+6 - Navigators
+
+7 - Screens
+
+
+
+
+  
